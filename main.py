@@ -4,7 +4,7 @@ import os
 # ============================================================
 # CHEMINS
 # ============================================================
-DOSSIER_TRAVAIL = r"T:\Demba\PYTHON\Site_AERT\files"
+DOSSIER_TRAVAIL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
 sys.path.insert(0, DOSSIER_TRAVAIL)
 os.chdir(DOSSIER_TRAVAIL)
 
