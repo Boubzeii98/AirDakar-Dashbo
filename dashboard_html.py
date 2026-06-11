@@ -605,7 +605,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<p class="ei">Outil de visualisation en temps reel de la qualite de l\'air dans la region de Dakar. Donnees issues de 16 stations via l\'API OpenAQ, mis a jour toutes les 60 secondes.</p>'
     page += '<div class="ac">'
     page += '<div class="acc"><div class="act">Source des donnees</div><div class="acb">OpenAQ - API v3, acces libre.<br><a href="https://openaq.org" class="aal">openaq.org</a></div></div>'
-    page += '<div class="acc"><div class="act">Limites administratives</div><div class="acb">Shapefile communes<br>T:\\Demba\\PYTHON\\Site_AERT\\data\\Dakar_communes.shp</div></div>'
+    page += '<div class="acc"><div class="act">Limites administratives</div><div class="acb">Shapefile communes - Decoupage administratif Dakar<br>Source : donnees geographiques locales</div></div>'
     page += '<div class="acc"><div class="act">Technologies</div><div class="acb">Python 3 &bull; Folium &bull; GeoPandas &bull; Pandas &bull; Requests</div></div>'
     page += '<div class="acc"><div class="act">Polluant surveille</div><div class="acb">PM2.5 &le; 2,5 µm &bull; Seuil OMS : 5 µg/m³</div></div>'
     page += '</div>'
