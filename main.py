@@ -4,7 +4,7 @@ import os
 # ============================================================
 # CHEMINS
 # ============================================================
-DOSSIER_TRAVAIL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
+DOSSIER_TRAVAIL = r"T:\Demba\PYTHON\Site_AERT\files"
 sys.path.insert(0, DOSSIER_TRAVAIL)
 os.chdir(DOSSIER_TRAVAIL)
 
@@ -12,7 +12,8 @@ import requests
 import pandas as pd
 import geopandas as gpd
 import folium
-from folium.plugins import HeatMapWithTime
+import webbrowser
+import time
 import json
 import math
 import base64
@@ -25,9 +26,11 @@ from dashboard_html import generer_dashboard
 
 API_KEY     = "cfb71a7180f965f61b7f40e94abe1544d8b303c79995470917122e1060cb3656"
 HEADERS     = {"X-API-Key": API_KEY}
-OUTPUT_HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+OUTPUT_HTML = os.path.join(DOSSIER_TRAVAIL, "airdakar.html")
 RAYON_M     = 200
-CHEMIN_SHP_COMMUNES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Dakar_communes.shp")
+INTERVALLE  = 60
+
+CHEMIN_SHP_COMMUNES = r"T:\Demba\PYTHON\Site_AERT\data\Dakar_communes.shp"
 
 STATIONS_IDS = [
     1531944, 3315287, 3400976, 3431595, 3439881,
@@ -371,21 +374,6 @@ def construire_carte_html(df):
         ).add_to(fg_s)
         fg_s.add_to(m)
 
-    # ── HeatMap temporelle ─────────────────────────────────────────────────
-    dates_uniques = sorted(df["Date"].unique())
-    heat_data, index_dates = [], []
-    for d in dates_uniques:
-        td = df[df["Date"] == d]
-        heat_data.append([
-            [r["Latitude"], r["Longitude"], r["PM25"]] for _, r in td.iterrows()
-        ])
-        index_dates.append(str(d))
-    HeatMapWithTime(
-        heat_data, index=index_dates, auto_play=True,
-        radius=40, max_opacity=0.8, use_local_extrema=True,
-        name="Heatmap temporelle"
-    ).add_to(m)
-
     folium.LayerControl(position="topright", collapsed=True).add_to(m)
 
     # Injection d'un pont de communication iframe -> parent
@@ -465,24 +453,35 @@ def calculer_kpi(df):
 # BOUCLE PRINCIPALE
 # ============================================================
 
-print("\n" + "=" * 50)
-print("GENERATION - " + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-print("=" * 50)
+premiere_ouverture = True
 
-mesures = collecter_donnees()
-if not mesures:
-    print("[ERR ] Aucune donnee collectee - arret")
-    exit(1)
+while True:
+    print("\n" + "=" * 50)
+    print("MISE A JOUR - " + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+    print("=" * 50)
 
-df = pd.DataFrame(mesures)
-df["Date"] = pd.to_datetime(df["Date"])
-df = df.sort_values("Date")
-print("[INFO] Total mesures : " + str(len(df)))
+    mesures = collecter_donnees()
+    if not mesures:
+        print("[WARN] Aucune donnee, nouvelle tentative dans 60s")
+        time.sleep(INTERVALLE)
+        continue
 
-kpi                    = calculer_kpi(df)
-carte_html, clat, clon, id_fg_contours, id_fg_qualite, id_fg_labels = construire_carte_html(df)
-html_final             = generer_dashboard(kpi, carte_html, clat, clon, communes_data_global, id_fg_contours, id_fg_qualite, id_fg_labels)
+    df = pd.DataFrame(mesures)
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values("Date")
+    print("[INFO] Total mesures : " + str(len(df)))
 
-with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
-    f.write(html_final)
-print("[ OK ] Dashboard genere : " + OUTPUT_HTML)
+    kpi                    = calculer_kpi(df)
+    carte_html, clat, clon, id_fg_contours, id_fg_qualite, id_fg_labels = construire_carte_html(df)
+    html_final             = generer_dashboard(kpi, carte_html, clat, clon, communes_data_global, id_fg_contours, id_fg_qualite, id_fg_labels)
+
+    with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
+        f.write(html_final)
+    print("[ OK ] Dashboard : " + OUTPUT_HTML)
+
+    if premiere_ouverture:
+        webbrowser.open(OUTPUT_HTML)
+        premiere_ouverture = False
+
+    print("[INFO] Prochaine MAJ dans " + str(INTERVALLE) + "s")
+    time.sleep(INTERVALLE)
