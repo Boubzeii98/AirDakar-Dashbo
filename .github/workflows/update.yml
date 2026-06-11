@@ -2,9 +2,7 @@ name: Mise a jour hebdomadaire AirDakar
 
 on:
   schedule:
-    # Chaque lundi a 06h00 UTC
     - cron: '0 6 * * 1'
-  # Permet aussi de lancer manuellement depuis l'interface GitHub
   workflow_dispatch:
 
 permissions:
@@ -23,15 +21,15 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Installer les dependances
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
       - name: Installer les dependances systeme pour GeoPandas
         run: |
           sudo apt-get update -q
           sudo apt-get install -y libgdal-dev
+
+      - name: Installer les dependances Python
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Generer le dashboard
         run: python main.py
@@ -42,4 +40,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .
           publish_branch: gh-pages
-          include_files: index.html
+          keep_files: false
