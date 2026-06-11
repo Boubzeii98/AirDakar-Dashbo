@@ -203,7 +203,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
 .hkd{font-size:12px;color:var(--hero-kd);line-height:1.5}
 .hks{font-size:10px;color:var(--hero-ks);margin-top:4px}
 .hbtn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:12px 26px;background:#00e676;color:#041a0c;border:none;border-radius:8px;cursor:pointer}
-.dc{padding:12px 16px;display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden}
+.dc{padding:12px 16px;display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden;min-height:0}
 .dt{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .dtl{font-size:12px;color:var(--ts)}
 .dbtn{font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border);background:var(--c2);color:var(--ts);cursor:pointer}
@@ -314,7 +314,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
   .dr{display:none;}  /* panneau droit masque sur mobile */
 
   /* KPI : 2 colonnes */
-  .kr{grid-template-columns:repeat(2,1fr);gap:6px;}
+  .kr{grid-template-columns:repeat(2,1fr);gap:6px;overflow:visible;}
+  .dc{overflow:visible;}
+  .dl{overflow:visible;min-height:0;}
 
   /* Carte : hauteur fixe sur mobile */
   .cb{min-height:55vh;}
@@ -371,10 +373,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>'
     page += '</div></nav>'
     page += '<div class="nav-mobile" id="nav-mobile">'
-    page += '<button class="lnk active" id="mob-accueil" onclick="showPage(\'accueil\',this);toggleMenu()">&#127968; Accueil</button>'
-    page += '<button class="lnk" id="mob-dashboard" onclick="showPage(\'dashboard\',this);toggleMenu()">&#127759; Tableau de bord</button>'
-    page += '<button class="lnk" id="mob-pourquoi" onclick="showPage(\'pourquoi\',this);toggleMenu()">&#10067; Pourquoi la qualite de l\'air ?</button>'
-    page += '<button class="lnk" id="mob-apropos" onclick="showPage(\'apropos\',this);toggleMenu()">&#8505; A propos</button>'
+    page += '<button class="lnk active" id="mob-accueil" onclick="showPage(\'accueil\',this);toggleMenu()">Accueil</button>'
+    page += '<button class="lnk" id="mob-dashboard" onclick="showPage(\'dashboard\',this);toggleMenu()">Tableau de bord</button>'
+    page += '<button class="lnk" id="mob-pourquoi" onclick="showPage(\'pourquoi\',this);toggleMenu()">Pourquoi la qualite de l\'air ?</button>'
+    page += '<button class="lnk" id="mob-apropos" onclick="showPage(\'apropos\',this);toggleMenu()">A propos</button>'
     page += '</div>'
 
     # ── PAGE ACCUEIL ───────────────────────────────────────────────────────
@@ -595,7 +597,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
 
     # ── PAGE A PROPOS ──────────────────────────────────────────────────────
     page += '<div id="page-apropos" class="page"><div class="ep">'
-    page += '<div class="etag">&#8505; A propos</div>'
+    page += '<div class="etag">A propos</div>'
     page += '<h1 class="eh1">A propos d\'<span>AirDakar</span></h1>'
     page += '<p class="ei">Outil de visualisation en temps reel de la qualite de l\'air dans la region de Dakar. Donnees issues de 16 stations via l\'API OpenAQ, mis a jour toutes les 60 secondes.</p>'
     page += '<div class="ac">'
