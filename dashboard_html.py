@@ -314,18 +314,21 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
   .dr{display:none;}  /* panneau droit masque sur mobile */
 
   /* KPI : 2 colonnes */
-  .kr{grid-template-columns:repeat(2,1fr);gap:6px;overflow:visible;}
-  .dc{overflow:visible;}
-  .dl{overflow:visible;min-height:0;}
+  .kr{grid-template-columns:repeat(2,1fr);gap:6px;}
+  .dc{overflow-y:auto;overflow-x:hidden;}
+  .dl{overflow:visible;}
 
   /* Carte : hauteur fixe sur mobile */
-  .cb{min-height:55vh;}
-  .cmap{min-height:45vh;}
+  .cb{min-height:50vh;height:50vh;}
+  .cmap{min-height:42vh;height:42vh;}
 
-  /* Barre filtres : scroll horizontal */
-  .fb{overflow-x:auto;flex-wrap:nowrap;gap:6px;padding:6px 10px;}
-  .fb::-webkit-scrollbar{height:3px;}
-  .fb::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  /* Barre filtres : 2 lignes sur mobile */
+  .fb{flex-wrap:wrap;gap:5px;padding:6px 8px;}
+  .fl{display:none;}
+  .fsep{display:none;}
+  .fs{flex:1;min-width:120px;font-size:11px;}
+  .fcouche{font-size:10px;padding:4px 8px;}
+  .fn{font-size:10px;padding:4px 8px;}
 
   /* Panneau fond de carte */
   #fond-panel > div{min-width:90vw !important;padding:18px 16px !important;}
@@ -729,6 +732,11 @@ function changerFond(nom) {
 
 document.getElementById("fond-panel").addEventListener("click", function(e) {
     if (e.target === this) toggleFondPanel();
+});
+
+// Forcer la page accueil au chargement
+document.addEventListener("DOMContentLoaded", function() {
+    showPage("accueil", document.querySelector(".lnk.active"));
 });
 
 // Menu hamburger mobile
