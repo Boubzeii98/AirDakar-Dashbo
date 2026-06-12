@@ -349,11 +349,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
   .tbtn{bottom:16px;left:16px;width:38px;height:38px;font-size:17px;}
 }
 
-/* Etiquettes stations Folium sur mobile */
-@media(max-width:768px){
-  .leaflet-div-icon div { transform: scale(0.7); transform-origin: top left; }
-}
-
 @media(max-width:480px){
   .hh1{font-size:22px;}
   .kr{grid-template-columns:repeat(2,1fr);}
