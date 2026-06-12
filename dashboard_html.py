@@ -18,10 +18,12 @@ def label_pm25(v):
     return "Mauvais"
 
 
-def generer_dashboard(kpi, carte_html, centre_lat, centre_lon, communes_data=None, id_fg_contours='', id_fg_qualite='', id_fg_labels=''):
+def generer_dashboard(kpi, carte_html, centre_lat, centre_lon, communes_data=None, id_fg_contours='', id_fg_qualite='', id_fg_labels='', historique_data=None):
 
     if communes_data is None:
         communes_data = {}
+    if historique_data is None:
+        historique_data = []
 
     derniere     = kpi["derniere"]
     pm_moyen     = kpi["pm_moyen"]
@@ -124,6 +126,7 @@ def generer_dashboard(kpi, carte_html, centre_lat, centre_lon, communes_data=Non
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <title>AirDakar - Qualite de l air</title>
 <style>
 :root[data-theme="dark"]{
@@ -368,6 +371,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<button class="lnk active" onclick="showPage(\'accueil\',this)">Accueil</button>'
     page += '<button class="lnk" onclick="showPage(\'dashboard\',this)">Tableau de bord</button>'
     page += '<button class="lnk" onclick="showPage(\'pourquoi\',this)">Pourquoi la qualite de l\'air ?</button>'
+    page += '<button class="lnk" onclick="showPage(\'stats\',this)">Statistiques</button>'
     page += '<button class="lnk" onclick="showPage(\'apropos\',this)">A propos</button>'
     page += '</div>'
     page += '<div class="nr">'
@@ -379,6 +383,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<button class="lnk active" id="mob-accueil" onclick="showPage(\'accueil\',this);toggleMenu()">Accueil</button>'
     page += '<button class="lnk" id="mob-dashboard" onclick="showPage(\'dashboard\',this);toggleMenu()">Tableau de bord</button>'
     page += '<button class="lnk" id="mob-pourquoi" onclick="showPage(\'pourquoi\',this);toggleMenu()">Pourquoi la qualite de l\'air ?</button>'
+    page += '<button class="lnk" id="mob-stats" onclick="showPage(\'stats\',this);toggleMenu()">Statistiques</button>'
     page += '<button class="lnk" id="mob-apropos" onclick="showPage(\'apropos\',this);toggleMenu()">A propos</button>'
     page += '</div>'
 
@@ -598,6 +603,42 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<div style="margin-top:14px;font-size:11px;color:var(--th);">Sources : <a href="https://openaq.org/why-air-quality/" style="color:#00bcd4;">OpenAQ</a> &bull; OMS &bull; UNICEF &bull; State of Global Air 2024</div>'
     page += '</div></div>'
 
+    # ── PAGE STATISTIQUES ──────────────────────────────────────────────────
+    page += '<div id="page-stats" class="page"><div class="ep">'
+    page += '<div class="etag">Statistiques</div>'
+    page += '<h1 class="eh1">Analyse de la <span>qualite de l\'air</span></h1>'
+    page += '<p class="ei">Visualisez les donnees PM2.5 par station et par commune.</p>'
+
+    # Filtre station pour graphiques
+    page += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">'
+    page += '<label style="font-size:12px;color:var(--ts);">Station :</label>'
+    page += '<select id="stats-station" class="fs" style="min-width:200px;">'
+    page += '<option value="">-- Toutes les stations --</option>' + options_stations
+    page += '</select>'
+    page += '<button onclick="filtrerStats()" class="fn fr" style="padding:5px 14px;">Afficher</button>'
+    page += '</div>'
+
+    # Graphique 1 : Courbe temporelle
+    page += '<div class="esec">Evolution temporelle PM2.5</div>'
+    page += '<div style="background:var(--c1);border:0.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;">'
+    page += '<canvas id="chart-courbe" style="width:100%;max-height:280px;"></canvas>'
+    page += '</div>'
+
+    # Graphique 2 : Barres comparatives stations
+    page += '<div class="esec">Comparaison des stations (derniere mesure)</div>'
+    page += '<div style="background:var(--c1);border:0.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;">'
+    page += '<canvas id="chart-barres" style="width:100%;max-height:320px;"></canvas>'
+    page += '</div>'
+
+    # Graphique 3 : PM2.5 par commune
+    page += '<div class="esec">PM2.5 moyen par commune</div>'
+    page += '<div style="background:var(--c1);border:0.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;">'
+    page += '<canvas id="chart-communes" style="width:100%;max-height:400px;"></canvas>'
+    page += '</div>'
+
+    page += '</div></div>'
+
+
     # ── PAGE A PROPOS ──────────────────────────────────────────────────────
     page += '<div id="page-apropos" class="page"><div class="ep">'
     page += '<div class="etag">A propos</div>'
@@ -647,6 +688,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += 'var ID_FG_CONTOURS   = "' + id_fg_contours + '";'
     page += 'var ID_FG_QUALITE    = "' + id_fg_qualite + '";'
     page += 'var ID_FG_LABELS     = "' + id_fg_labels + '";'
+    page += 'var historiqueStats  = ' + _json.dumps(historique_data) + ';'
 
     # IMPORTANT : tout le JavaScript est dans un seul bloc f-string
     # pour eviter les commentaires Python parasites injectes dans le HTML
@@ -770,6 +812,9 @@ function showPage(id, btn) {
             avecCarte(function(map) { map.invalidateSize(); });
         }, 120);
     }
+    if (id === "stats") {
+        setTimeout(function() { initCharts(); }, 150);
+    }
 }
 
 // Theme
@@ -875,6 +920,122 @@ document.getElementById("btn-reset").addEventListener("click", function() {
 });
 
 """
+
+    page += '''
+
+
+// ── STATISTIQUES ──────────────────────────────────────────────
+var chartCourbe   = null;
+var chartBarres   = null;
+var chartCommunes = null;
+
+function couleurPM25js(v) {
+    if (v <= 5)  return "#00e676";
+    if (v <= 15) return "#ff9800";
+    return "#f44336";
+}
+
+function initCharts() {
+    var isDark = document.documentElement.getAttribute("data-theme") !== "light";
+    var textColor = isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)";
+    var gridColor = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)";
+    Chart.defaults.color = textColor;
+
+    var stationFiltre = document.getElementById("stats-station") ?
+        document.getElementById("stats-station").value : "";
+
+    // Graphique 1 : Courbe temporelle
+    var stationsAff = stationFiltre ?
+        historiqueStats.filter(function(s){ return s.nom === stationFiltre; }) :
+        historiqueStats.slice(0, 5);
+
+    var labelsTemps = stationsAff.length > 0 ?
+        stationsAff[0].dates.map(function(d){ return d.substring(5,16); }) : [];
+
+    var couleurs = ["#00e676","#ff9800","#f44336","#00bcd4","#7f77dd","#ffeb3b","#e91e63","#4caf50"];
+    var datasetsTemps = stationsAff.map(function(s, i) {
+        return {
+            label: s.nom.substring(0,22),
+            data: s.valeurs,
+            borderColor: couleurs[i % couleurs.length],
+            backgroundColor: "transparent",
+            tension: 0.3, pointRadius: 2, borderWidth: 1.5
+        };
+    });
+
+    if (chartCourbe) chartCourbe.destroy();
+    var ctx1 = document.getElementById("chart-courbe");
+    if (ctx1) {
+        chartCourbe = new Chart(ctx1, {
+            type: "line",
+            data: { labels: labelsTemps, datasets: datasetsTemps },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } } },
+                scales: {
+                    y: { title: { display: true, text: "µg/m³" }, grid: { color: gridColor } },
+                    x: { ticks: { maxTicksLimit: 8, maxRotation: 30, font: { size: 9 } }, grid: { color: gridColor } }
+                }
+            }
+        });
+    }
+
+    // Graphique 2 : Barres comparatives stations
+    var stationsFiltrees = stationFiltre ?
+        stationsDash.filter(function(s){ return s.nom === stationFiltre; }) : stationsDash;
+    var nomsS = stationsFiltrees.map(function(s){ return s.nom.substring(0,18); });
+    var valeursS = stationsFiltrees.map(function(s){ return s.pm25; });
+    var couleursS = stationsFiltrees.map(function(s){ return couleurPM25js(s.pm25); });
+
+    if (chartBarres) chartBarres.destroy();
+    var ctx2 = document.getElementById("chart-barres");
+    if (ctx2) {
+        chartBarres = new Chart(ctx2, {
+            type: "bar",
+            data: { labels: nomsS, datasets: [{ label: "PM2.5 µg/m³", data: valeursS, backgroundColor: couleursS, borderRadius: 4 }] },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { title: { display: true, text: "µg/m³" }, grid: { color: gridColor } },
+                    x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // Graphique 3 : PM2.5 par commune
+    var nomsC = Object.keys(communesDash).sort();
+    var valeursC = nomsC.map(function(n){ return communesDash[n].pm25 || 0; });
+    var couleursC = valeursC.map(function(v){ return couleurPM25js(v); });
+
+    if (chartCommunes) chartCommunes.destroy();
+    var ctx3 = document.getElementById("chart-communes");
+    if (ctx3) {
+        chartCommunes = new Chart(ctx3, {
+            type: "bar",
+            data: { labels: nomsC, datasets: [{ label: "PM2.5 µg/m³", data: valeursC, backgroundColor: couleursC, borderRadius: 4 }] },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { title: { display: true, text: "µg/m³" }, grid: { color: gridColor } },
+                    y: { ticks: { font: { size: 9 } }, grid: { display: false } }
+                }
+            }
+        });
+    }
+}
+
+function filtrerStats() {
+    if (chartCourbe)   chartCourbe.destroy();
+    if (chartBarres)   chartBarres.destroy();
+    if (chartCommunes) chartCommunes.destroy();
+    initCharts();
+}
+
+'''
 
     page += '</script></body></html>'
 
