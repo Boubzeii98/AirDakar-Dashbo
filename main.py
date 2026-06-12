@@ -410,6 +410,23 @@ def calculer_kpi(df):
     }
 
 # ============================================================
+# PREPARATION HISTORIQUE
+# ============================================================
+
+def preparer_historique(df):
+    historique = []
+    for nom_station in df["Station"].unique():
+        df_st = df[df["Station"] == nom_station].sort_values("Date")
+        dates  = [str(d)[:16] for d in df_st["Date"].tolist()]
+        valeurs = [round(float(v), 1) for v in df_st["PM25"].tolist()]
+        historique.append({
+            "nom"    : nom_station,
+            "dates"  : dates,
+            "valeurs": valeurs
+        })
+    return historique
+
+# ============================================================
 # EXECUTION UNIQUE (pas de boucle)
 # ============================================================
 
@@ -429,7 +446,8 @@ print("[INFO] Total mesures : " + str(len(df)))
 
 kpi                    = calculer_kpi(df)
 carte_html, clat, clon, id_fg_contours, id_fg_qualite, id_fg_labels = construire_carte_html(df)
-html_final             = generer_dashboard(kpi, carte_html, clat, clon, communes_data_global, id_fg_contours, id_fg_qualite, id_fg_labels)
+historique             = preparer_historique(df)
+html_final             = generer_dashboard(kpi, carte_html, clat, clon, communes_data_global, id_fg_contours, id_fg_qualite, id_fg_labels, historique)
 
 with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
     f.write(html_final)
