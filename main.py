@@ -2,17 +2,15 @@ import sys
 import os
 
 # ============================================================
-# CHEMINS
+# CHEMINS - chemins relatifs pour GitHub Actions
 # ============================================================
 DOSSIER_TRAVAIL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "files")
-sys.path.insert(0, DOSSIER_TRAVAIL)
-os.chdir(DOSSIER_TRAVAIL)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import requests
 import pandas as pd
 import geopandas as gpd
 import folium
-from folium.plugins import HeatMapWithTime
 import json
 import math
 import base64
@@ -27,6 +25,7 @@ API_KEY     = "cfb71a7180f965f61b7f40e94abe1544d8b303c79995470917122e1060cb3656"
 HEADERS     = {"X-API-Key": API_KEY}
 OUTPUT_HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
 RAYON_M     = 200
+
 CHEMIN_SHP_COMMUNES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Dakar_communes.shp")
 
 STATIONS_IDS = [
@@ -89,7 +88,6 @@ def filtrer_dakar_gdf(gdf):
 
 gdf_communes = filtrer_dakar_gdf(charger_shapefile_communes(CHEMIN_SHP_COMMUNES))
 
-# Detection automatique du champ nom de commune
 CHAMP_NOM_COMMUNE = None
 if gdf_communes is not None:
     for candidat in ["NAME_3", "NAME_2", "shapeName", "nom", "name", "NAME", "ADM3_FR", "ADM3_EN", "commune", "COMMUNE", "GID_3"]:
@@ -202,26 +200,22 @@ def construire_carte_html(df):
 
     m = folium.Map(location=[centre_lat, centre_lon], zoom_start=12, tiles=None)
 
-    # Fonds de carte
     folium.TileLayer(
         tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         attr="Esri", name="Satellite", overlay=False, control=True
     ).add_to(m)
-    folium.TileLayer(
-        tiles="CartoDB positron", name="Clair", overlay=False, control=True
-    ).add_to(m)
-    folium.TileLayer(
-        tiles="OpenStreetMap", name="OpenStreetMap", overlay=False, control=True
-    ).add_to(m)
+    folium.TileLayer(tiles="CartoDB positron", name="Clair", overlay=False, control=True).add_to(m)
+    folium.TileLayer(tiles="OpenStreetMap", name="OpenStreetMap", overlay=False, control=True).add_to(m)
 
     tt = ("background-color:#0f0f19;color:white;font-family:'Segoe UI',Arial;"
           "font-size:13px;padding:8px 12px;border-radius:8px;border:none;")
 
     communes_data = {}
+    id_fg_contours = ""
+    id_fg_qualite  = ""
+    id_fg_labels   = ""
 
-    # ── Communes ───────────────────────────────────────────────────────────
     if gdf_communes is not None and not gdf_communes.empty:
-
         gdf_enrichi = gdf_communes.copy()
         gdf_enrichi["pm25"]        = None
         gdf_enrichi["qualite"]     = "Inconnu"
@@ -260,27 +254,22 @@ def construire_carte_html(df):
 
         geojson_enrichi = json.loads(gdf_enrichi.to_json())
 
-        # Couche 1 — contours
         fg_contours = folium.FeatureGroup(name="Communes \u2014 contours", show=True)
         folium.GeoJson(
             geojson_enrichi,
             style_function=lambda f: {
-                "color":       "#00bcd4",
-                "weight":      2,
-                "opacity":     0.9,
-                "fillOpacity": 0.0,
-                "dashArray":   "5 4"
+                "color": "#00bcd4", "weight": 2, "opacity": 0.9,
+                "fillOpacity": 0.0, "dashArray": "5 4"
             },
             tooltip=folium.GeoJsonTooltip(
-                fields   =[CHAMP_NOM_COMMUNE, "pm25", "qualite", "station_ref"],
-                aliases  =["Commune :", "PM2.5 (µg/m³) :", "Qualite :", "Station ref. :"],
-                style    =tt
+                fields=[CHAMP_NOM_COMMUNE, "pm25", "qualite", "station_ref"],
+                aliases=["Commune :", "PM2.5 (µg/m³) :", "Qualite :", "Station ref. :"],
+                style=tt
             )
         ).add_to(fg_contours)
         fg_contours.add_to(m)
         id_fg_contours = fg_contours.get_name()
 
-        # Couche 2 — remplissage colore PM2.5
         fg_qualite = folium.FeatureGroup(name="Communes \u2014 qualite PM2.5", show=True)
         folium.GeoJson(
             geojson_enrichi,
@@ -292,15 +281,14 @@ def construire_carte_html(df):
                 "opacity"    : 0.8
             },
             tooltip=folium.GeoJsonTooltip(
-                fields   =[CHAMP_NOM_COMMUNE, "pm25", "qualite", "station_ref"],
-                aliases  =["Commune :", "PM2.5 (µg/m³) :", "Qualite :", "Station ref. :"],
-                style    =tt
+                fields=[CHAMP_NOM_COMMUNE, "pm25", "qualite", "station_ref"],
+                aliases=["Commune :", "PM2.5 (µg/m³) :", "Qualite :", "Station ref. :"],
+                style=tt
             )
         ).add_to(fg_qualite)
         fg_qualite.add_to(m)
         id_fg_qualite = fg_qualite.get_name()
 
-        # Couche 3 — labels noms + valeur PM2.5
         fg_labels = folium.FeatureGroup(name="Communes \u2014 labels", show=True)
         for _, row in gdf_enrichi.iterrows():
             clat = row.geometry.centroid.y
@@ -315,8 +303,7 @@ def construire_carte_html(df):
             folium.Marker(
                 location=[clat, clon],
                 icon=folium.DivIcon(
-                    icon_size=(130, 40),
-                    icon_anchor=(65, 20),
+                    icon_size=(130, 40), icon_anchor=(65, 20),
                     html=(
                         "<div style=\"font-family:'Segoe UI',Arial;font-size:10px;font-weight:600;"
                         "color:white;text-shadow:0 0 4px #000,0 0 4px #000,0 0 4px #000;"
@@ -327,16 +314,10 @@ def construire_carte_html(df):
             ).add_to(fg_labels)
         fg_labels.add_to(m)
         id_fg_labels = fg_labels.get_name()
-
         print("[ OK ] Communes rendues : " + str(len(gdf_enrichi)))
-    else:
-        id_fg_contours = ""
-        id_fg_qualite  = ""
-        id_fg_labels   = ""
 
     communes_data_global = communes_data
 
-    # ── Stations ───────────────────────────────────────────────────────────
     for _, row in derniere.iterrows():
         c        = couleur_pm25(row["PM25"])
         pm_val   = round(float(row["PM25"]), 1)
@@ -354,8 +335,7 @@ def construire_carte_html(df):
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(
-                icon_size=(160, 70),
-                icon_anchor=(80, 35),
+                icon_size=(160, 70), icon_anchor=(80, 35),
                 html=(
                     "<div style=\"background:rgba(10,10,20,0.90);border:1.5px solid " + c + ";"
                     "border-radius:8px;padding:5px 9px;font-family:'Segoe UI',Arial;"
@@ -371,68 +351,36 @@ def construire_carte_html(df):
         ).add_to(fg_s)
         fg_s.add_to(m)
 
-    # ── HeatMap temporelle ─────────────────────────────────────────────────
-    dates_uniques = sorted(df["Date"].unique())
-    heat_data, index_dates = [], []
-    for d in dates_uniques:
-        td = df[df["Date"] == d]
-        heat_data.append([
-            [r["Latitude"], r["Longitude"], r["PM25"]] for _, r in td.iterrows()
-        ])
-        index_dates.append(str(d))
-    HeatMapWithTime(
-        heat_data, index=index_dates, auto_play=True,
-        radius=40, max_opacity=0.8, use_local_extrema=True,
-        name="Heatmap temporelle"
-    ).add_to(m)
-
     folium.LayerControl(position="topright", collapsed=True).add_to(m)
 
-    # Injection d'un pont de communication iframe -> parent
-    # La carte Folium vit dans un <iframe> ; ce script tourne DANS cet iframe
-    # et expose les fonctions de controle au parent via window.parent._iframeMap
     nom_map = m.get_name()
-
     script_pont = folium.Element("""
     <script>
     (function() {
         function exposerVersParent() {
             var map = window["%(nom_map)s"];
             if (!map || typeof map.setView !== "function") {
-                // Fallback : scan map_*
                 var keys = Object.keys(window);
                 for (var i = 0; i < keys.length; i++) {
                     var k = keys[i];
                     if (k.indexOf("map_") === 0) {
                         var obj = window[k];
-                        if (obj && typeof obj.setView === "function") {
-                            map = obj;
-                            break;
-                        }
+                        if (obj && typeof obj.setView === "function") { map = obj; break; }
                     }
                 }
             }
             if (!map) { setTimeout(exposerVersParent, 200); return; }
-
-            // Expose la carte et L au parent
             try {
                 window.parent._iframeMap = map;
                 window.parent._iframeL   = window.L;
                 window.parent._iframeMapReady = true;
-            } catch(e) {
-                // Securite cross-origin : ne devrait pas arriver en file://
-            }
+            } catch(e) {}
         }
-
-        if (document.readyState === "complete") {
-            exposerVersParent();
-        } else {
-            window.addEventListener("load", exposerVersParent);
-        }
+        if (document.readyState === "complete") { exposerVersParent(); }
+        else { window.addEventListener("load", exposerVersParent); }
     })();
     </script>
     """ % {"nom_map": nom_map})
-
     m.get_root().html.add_child(script_pont)
 
     return m._repr_html_(), centre_lat, centre_lon, id_fg_contours, id_fg_qualite, id_fg_labels
@@ -462,7 +410,7 @@ def calculer_kpi(df):
     }
 
 # ============================================================
-# BOUCLE PRINCIPALE
+# EXECUTION UNIQUE (pas de boucle)
 # ============================================================
 
 print("\n" + "=" * 50)
