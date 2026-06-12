@@ -335,16 +335,15 @@ def construire_carte_html(df):
         folium.Marker(
             location=[lat, lon],
             icon=folium.DivIcon(
-                icon_size=(160, 70), icon_anchor=(80, 35),
+                icon_size=(120, 55), icon_anchor=(60, 27),
                 html=(
                     "<div style=\"background:rgba(10,10,20,0.90);border:1.5px solid " + c + ";"
-                    "border-radius:8px;padding:5px 9px;font-family:'Segoe UI',Arial;"
+                    "border-radius:6px;padding:3px 7px;font-family:'Segoe UI',Arial;"
                     "color:white;white-space:nowrap;text-align:center;pointer-events:none;\">"
-                    "<div style=\"font-size:10px;color:rgba(255,255,255,0.6);max-width:140px;"
-                    "white-space:normal;line-height:1.3;\">" + nom + "</div>"
-                    "<div style=\"font-size:13px;font-weight:700;color:" + c + ";\">"
-                    + str(pm_val) + " <span style=\"font-size:10px;font-weight:400;\">µg/m³</span></div>"
-                    "<div style=\"font-size:9px;color:rgba(255,255,255,0.35);\">" + date_str + "</div>"
+                    "<div style=\"font-size:9px;color:rgba(255,255,255,0.6);max-width:110px;"
+                    "white-space:normal;line-height:1.2;\">" + nom[:30] + "</div>"
+                    "<div style=\"font-size:11px;font-weight:700;color:" + c + ";\">"
+                    + str(pm_val) + " <span style=\"font-size:9px;font-weight:400;\">µg/m³</span></div>"
                     "</div>"
                 )
             )
