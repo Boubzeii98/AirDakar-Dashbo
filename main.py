@@ -332,20 +332,21 @@ def construire_carte_html(df):
             color=c, fill=True, fill_color=c,
             fill_opacity=0.3, weight=2, opacity=0.9
         ).add_to(fg_s)
-        folium.Marker(
+        folium.CircleMarker(
             location=[lat, lon],
-            icon=folium.DivIcon(
-                icon_size=(120, 55), icon_anchor=(60, 27),
-                html=(
-                    "<div style=\"background:rgba(10,10,20,0.90);border:1.5px solid " + c + ";"
-                    "border-radius:6px;padding:3px 7px;font-family:'Segoe UI',Arial;"
-                    "color:white;white-space:nowrap;text-align:center;pointer-events:none;\">"
-                    "<div style=\"font-size:9px;color:rgba(255,255,255,0.6);max-width:110px;"
-                    "white-space:normal;line-height:1.2;\">" + nom[:30] + "</div>"
-                    "<div style=\"font-size:11px;font-weight:700;color:" + c + ";\">"
-                    + str(pm_val) + " <span style=\"font-size:9px;font-weight:400;\">µg/m³</span></div>"
-                    "</div>"
-                )
+            radius=8,
+            color=c,
+            fill=True,
+            fill_color=c,
+            fill_opacity=0.9,
+            weight=2,
+            tooltip=folium.Tooltip(
+                "<b>" + nom + "</b><br>" + str(pm_val) + " µg/m³",
+                style="background:#0f0f19;color:white;font-family:'Segoe UI',Arial;font-size:12px;padding:6px 10px;border-radius:6px;border:none;"
+            ),
+            popup=folium.Popup(
+                "<b>" + nom + "</b><br>PM2.5 : <span style='color:" + c + ";font-weight:700;'>" + str(pm_val) + " µg/m³</span>",
+                max_width=200
             )
         ).add_to(fg_s)
         fg_s.add_to(m)
