@@ -556,7 +556,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<span class="at">' + str(nb_alertes) + ' depassements OMS</span>'
     page += '</div>' + alertes_contenu + '</div></div>'
 
-    page += '<div class="pb"><div class="ps">Legende PM2.5</div>'
+    page += '<div class="pb">'
+    page += '<div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleLegende()">'
+    page += '<div class="ps" style="margin-bottom:0;">Legende PM2.5</div>'
+    page += '<span id="legende-toggle-icon" style="font-size:11px;color:var(--ts);">&#9650;</span>'
+    page += '</div>'
+    page += '<div id="legende-contenu" style="margin-top:8px;">'
     page += '<div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--tp);">'
     page += '<div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00e676;margin-right:8px;vertical-align:middle;"></span>Bon - 0 a 5 µg/m³</div>'
     page += '<div><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff9800;margin-right:8px;vertical-align:middle;"></span>Moyen - 5 a 15 µg/m³</div>'
@@ -565,7 +570,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<div style="margin-top:8px;font-size:10px;color:var(--th);">'
     page += '<span style="display:inline-block;width:18px;border-top:2px dashed #00bcd4;vertical-align:middle;margin-right:5px;"></span>Contours communes&nbsp;&nbsp;'
     page += '<span style="display:inline-block;width:12px;height:12px;background:rgba(0,230,118,0.4);border:1px solid #00e676;vertical-align:middle;margin-right:5px;border-radius:2px;"></span>Qualite PM2.5'
-    page += '</div></div>'
+    page += '</div>'
+    page += '</div>'
+    page += '</div>'
 
     page += '</div>'  # fin .dr
     page += '</div>'  # fin .dm
@@ -923,6 +930,16 @@ document.getElementById("btn-reset").addEventListener("click", function() {
 
     page += '''
 
+
+// Legende toggle
+var legendeVisible = true;
+function toggleLegende() {
+    legendeVisible = !legendeVisible;
+    var contenu = document.getElementById("legende-contenu");
+    var icon    = document.getElementById("legende-toggle-icon");
+    if (contenu) contenu.style.display = legendeVisible ? "block" : "none";
+    if (icon)    icon.textContent = legendeVisible ? "\u25b2" : "\u25bc";
+}
 
 // ── STATISTIQUES ──────────────────────────────────────────────
 var chartCourbe   = null;
