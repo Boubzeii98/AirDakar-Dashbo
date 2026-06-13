@@ -575,12 +575,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     # ── PAGE POURQUOI ──────────────────────────────────────────────────────
     page += '<div id="page-pourquoi" class="page"><div class="ep">'
     page += '<div class="etag">&#9680; Pourquoi la qualite de l\'air ?</div>'
-    page += '<h1 class="eh1">La pollution de l\'air est la <span>2e cause de mortalite</span> dans le monde</h1>'
+    page += '<h1 class="eh1">La pollution de l\'air est la <span>2e cause de mortalite</span> dans le monde, apres l\'hypertension arterielle</h1>'
     page += '<p class="ei">Jusqu\'a 99% d\'entre nous respirons un air pollue, reduisant notre esperance de vie de 1,9 an en moyenne.</p>'
     page += '<div class="egrille">'
-    page += '<div class="ecard"><div class="enum" style="color:#f44336;">8M+</div><div class="edesc">deces annuels lies a la pollution de l\'air</div><div class="esrc">State of Global Air, 2024</div></div>'
-    page += '<div class="ecard"><div class="enum" style="color:#ff9800;">99%</div><div class="edesc">de la population mondiale respire un air pollue</div><div class="esrc">OMS</div></div>'
-    page += '<div class="ecard"><div class="enum" style="color:#00bcd4;">2 000</div><div class="edesc">enfants de moins de 5 ans meurent chaque jour</div><div class="esrc">UNICEF</div></div>'
+    page += '<div class="ecard"><div class="enum" style="color:#f44336;">8M+</div><div class="edesc">deces annuels lies a la pollution de l\'air</div><div class="esrc"><a href="https://www.stateofglobalair.org/resources/report/state-global-air-report-2024" target="_blank" class="aal">State of Global Air, 2024</a></div></div>'
+    page += '<div class="ecard"><div class="enum" style="color:#ff9800;">99%</div><div class="edesc">de la population mondiale respire un air pollue</div><div class="esrc"><a href="https://www.who.int/fr/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health" target="_blank" class="aal">OMS</a></div></div>'
+    page += '<div class="ecard"><div class="enum" style="color:#00bcd4;">2 000</div><div class="edesc">enfants de moins de 5 ans meurent chaque jour</div><div class="esrc"><a href="https://www.unicef.org/reports/breathe-life-2030" target="_blank" class="aal">UNICEF</a></div></div>'
     page += '</div>'
     page += '<div class="esec">Impacts sur la sante</div>'
     page += '<div class="eig">'
@@ -600,7 +600,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     page += '<p class="edbp">Seulement 61% des gouvernements mondiaux produisent des donnees sur la qualite de l\'air, laissant plus d\'un milliard de personnes sans information pour se proteger.</p>'
     page += '<div class="pills"><span class="pill">Surveillance en temps reel</span><span class="pill">Politiques publiques</span><span class="pill">Recherche scientifique</span><span class="pill">Protection des populations</span></div>'
     page += '</div>'
-    page += '<div style="margin-top:14px;font-size:11px;color:var(--th);">Sources : <a href="https://openaq.org/why-air-quality/" style="color:#00bcd4;">OpenAQ</a> &bull; OMS &bull; UNICEF &bull; State of Global Air 2024</div>'
+    page += '<div style="margin-top:14px;font-size:11px;color:var(--th);">Sources : <a href="https://openaq.org/why-air-quality/" target="_blank" style="color:#00bcd4;">OpenAQ</a> &bull; <a href="https://www.who.int/fr/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health" target="_blank" style="color:#00bcd4;">OMS</a> &bull; <a href="https://www.unicef.org/reports/breathe-life-2030" target="_blank" style="color:#00bcd4;">UNICEF</a> &bull; <a href="https://www.stateofglobalair.org/resources/report/state-global-air-report-2024" target="_blank" style="color:#00bcd4;">State of Global Air 2024</a></div>'
     page += '</div></div>'
 
     # ── PAGE STATISTIQUES ──────────────────────────────────────────────────
