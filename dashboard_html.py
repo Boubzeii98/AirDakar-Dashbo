@@ -575,7 +575,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tp
     # ── PAGE POURQUOI ──────────────────────────────────────────────────────
     page += '<div id="page-pourquoi" class="page"><div class="ep">'
     page += '<div class="etag">&#9680; Pourquoi la qualite de l\'air ?</div>'
-    page += '<h1 class="eh1">La pollution de l\'air est la <span>2e cause de mortalite</span> dans le monde, apres l\'hypertension arterielle</h1>'
+    page += '<h1 class="eh1">La pollution de l\'air est la <span>2e cause de mortalite</span> dans le monde, apres l\'hypertension arterielle <a href="https://www.stateofglobalair.org/resources/report/state-global-air-report-2024" target="_blank" style="font-size:13px;font-weight:400;color:#00bcd4;vertical-align:super;">[source]</a></h1>'
     page += '<p class="ei">Jusqu\'a 99% d\'entre nous respirons un air pollue, reduisant notre esperance de vie de 1,9 an en moyenne.</p>'
     page += '<div class="egrille">'
     page += '<div class="ecard"><div class="enum" style="color:#f44336;">8M+</div><div class="edesc">deces annuels lies a la pollution de l\'air</div><div class="esrc"><a href="https://www.stateofglobalair.org/resources/report/state-global-air-report-2024" target="_blank" class="aal">State of Global Air, 2024</a></div></div>'
